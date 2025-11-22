@@ -9,8 +9,8 @@ const order = mongoose.model("order",new mongoose.Schema({
     }
   ],
   total: Number,
-  stripeSessionId: String, // solo referencia
-  status: { type: String, default: "paid" }, // paid, refunded, canceled
+  stripeSessionId: String, 
+  status: { type: String, default: "paid" },
   createdAt: { type: Date, default: Date.now }
 }))
 
