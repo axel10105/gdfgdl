@@ -194,13 +194,13 @@ exports.createCheckout = async (req, res) => {
     const userId = req.userId;
     const couponCode = req.body.couponCode;
 
-  
+    // Traer carrito con populate
     const cart = await Cart.findOne({ userId }).populate('items.productId');
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({ message: "Carrito vacío" });
     }
 
-    
+    // Filtrar productos válidos
     const validItems = cart.items.filter(
       item => item.productId && item.productId.prices.length > 0
     );
@@ -208,12 +208,13 @@ exports.createCheckout = async (req, res) => {
       return res.status(400).json({ message: "No hay productos válidos en el carrito" });
     }
 
-     
+        // Calcular total
         let total = validItems.reduce(
         (sum, item) => sum + item.productId.prices[0].amount * item.quantity,
         0
         );
 
+    // Aplicar descuento si hay cupón
     let discount = 0;
     let stripeCouponId = null;
 
@@ -233,15 +234,16 @@ exports.createCheckout = async (req, res) => {
 
       if (total < 0) total = 0;
 
-      stripeCouponId = coupon.stripeId; 
+      stripeCouponId = coupon.stripeId; // si creaste el cupón en Stripe y guardaste su ID
     }
 
+    // Crear line_items para Stripe
     const line_items = validItems.map(item => ({
       price: item.productId.prices[0].stripePriceId,
       quantity: item.quantity
     }));
 
-    
+    // Crear sesión Stripe
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       line_items,
@@ -250,7 +252,7 @@ exports.createCheckout = async (req, res) => {
       cancel_url: `http://localhost:5000/api/product/cancel`
     });
 
-    
+    // Guardar orden en DB
     await Order.create({
       userId,
       items: validItems,
