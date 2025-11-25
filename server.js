@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const PORT = (process.env.PORT || 8080,"0.0.0.0");
+const PORT = process.env.PORT || 8080;
 const express = require('express');
 const morgan = require('morgan');
 const helmet = require('helmet');
@@ -48,6 +48,6 @@ db.mongoose.connect(process.env.MONGO_URI,{}).then(()=>{
 
 
 
-app.listen(PORT, ()=>{
+app.listen(PORT,"0.0.0.0",()=>{
     console.log(`Servidor iniciado en el puerto ${PORT}`);
 })
