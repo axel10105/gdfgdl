@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const PORT = process.env.PORT || 8080;
+const PORT = (process.env.PORT || 8080,"0.0.0.0");
 const express = require('express');
 const morgan = require('morgan');
 const helmet = require('helmet');
